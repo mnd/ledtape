@@ -17,19 +17,16 @@
 
 #include <libstm8/stm8l.h>
 
-#define RED   GPIO2		/* TIM1_CH1 */
-#define BLUE  GPIO4		/* TIM1_CH2 */
-#define GREEN GPIO5		/* TIM1_CH3 */
-
 void
 gpio_setup ()
 {
-  /* BUG: PD5 OD mode switches to PP when we run PWM. Other pins work fine */
-  /* TIM1_CH1, TIM1_CH2, TIM1_CH3 */
+  /* TIM1_CH1, TIM1_CH2, TIM1_CH3N */
   gpio_mode_setup (GPIOD, GPIO_MODE_OUTPUT, GPIO_CR1_OD, GPIO_CR2_2,
-		   GPIO2 | GPIO4 | GPIO5);
+		   GPIO2 | GPIO4);
+  /* BUG: PD5 OD mode switches to PP when we run PWM. So use TIM1_CH3N */
+  gpio_mode_setup (GPIOE, GPIO_MODE_OUTPUT, GPIO_CR1_OD, GPIO_CR2_2, GPIO2);
 
-  /* USART1_RX + BLUE LED*/
+  /* USART1_RX */
   gpio_mode_setup (GPIOC, GPIO_MODE_INPUT, GPIO_CR1_FI, GPIO_CR2_ID, GPIO2);
 }
 
@@ -72,9 +69,9 @@ pwm_setup ()
   TIM1_CCR3H = 0x00;
   TIM1_CCR3L = 0x00;
 
-  /* Enable outputs */
+  /* Enable outputs. */
   TIM1_CCER1 |= TIM_CCER1_CC1E | TIM_CCER1_CC2E;
-  TIM1_CCER2 |= TIM_CCER2_CC3E;
+  TIM1_CCER2 |= TIM_CCER2_CC3NE;
   
   /* Enable output */
   TIM1_BKR |= TIM_BKR_MOE;
