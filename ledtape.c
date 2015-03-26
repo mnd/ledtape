@@ -35,36 +35,35 @@ pwm_setup ()
 {
   clk_periph_clock_enable (CLK_TIM1);
 
-  /* Divide clock frequency (Default 2MHz) by 200 = 100KHz */
-  TIM1_PSCRH = 0x00;
-  TIM1_PSCRL = 0x14;
+  timer_set_mode (TIM1_BASE, TIM_CMS_EDGE, TIM_DIR_UP);
+  /* Divide clock frequency (Default system clock freq = 2MHz) by 20 = 100KHz */
+  timer_set_prescaler (TIM1_BASE, 0x0014);
 
-  /* ARR preload register */
-  TIM1_CR1 |= TIM_CR1_ARPE;
+  /* preload auto reload value register */
+  timer_enable_preload (TIM1_BASE);
   
   /* auto reload value 0x00FF */
-  TIM1_ARRH = 0x00;
-  TIM1_ARRL = 0xFF;
+  timer_set_period (TIM1_BASE, 0x00FF);
 
   /* Update event every cycle */
-  TIM1_RCR = 0;
+  timer_set_repetition_counter (TIM1_BASE, 0);
 
   /* set to PWM mode */
   /* RED */
-  TIM1_CCMR1 |= TIM_CCMR1_OC1M_PWM_1 << TIM_CCMR1_OC1M_SHIFT;
-  TIM1_CCMR1 |= TIM_CCMR1_OC1PE;
+  timer_set_oc_mode (TIM1_BASE, TIM_OC1, TIM_OCM_PWM_1);
+  timer_enable_oc_preload (TIM1_BASE, TIM_OC1);
 
   TIM1_CCR1H = 0x00;
   TIM1_CCR1L = 0x00;
   /* BLUE */
-  TIM1_CCMR2 |= TIM_CCMR2_OC2M_PWM_1 << TIM_CCMR2_OC2M_SHIFT;
-  TIM1_CCMR2 |= TIM_CCMR2_OC2PE;
+  timer_set_oc_mode (TIM1_BASE, TIM_OC2, TIM_OCM_PWM_1);
+  timer_enable_oc_preload (TIM1_BASE, TIM_OC2);
  
   TIM1_CCR2H = 0x00;
   TIM1_CCR2L = 0x00;
   /* GREEN */
-  TIM1_CCMR3 |= TIM_CCMR3_OC3M_PWM_1 << TIM_CCMR3_OC3M_SHIFT;
-  TIM1_CCMR3 |= TIM_CCMR3_OC3PE;
+  timer_set_oc_mode (TIM1_BASE, TIM_OC3, TIM_OCM_PWM_1);
+  timer_enable_oc_preload (TIM1_BASE, TIM_OC3);
 
   TIM1_CCR3H = 0x00;
   TIM1_CCR3L = 0x00;
@@ -114,7 +113,7 @@ main ()
   pwm_setup ();
   usart_setup ();
   
-  set_color (0xF0, 0x80, 0x80);
+  set_color (0xF0, 0x80, 0x30);
   while (1)
     {
       for (d = 0, r = 0; d < 2; d++)
