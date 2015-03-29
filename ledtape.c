@@ -52,45 +52,39 @@ pwm_setup ()
   /* RED */
   timer_set_oc_mode (TIM1_BASE, TIM_OC1, TIM_OCM_PWM_1);
   timer_enable_oc_preload (TIM1_BASE, TIM_OC1);
+  timer_set_oc_value (TIM1_BASE, TIM_OC1, 0x0000);
 
-  TIM1_CCR1H = 0x00;
-  TIM1_CCR1L = 0x00;
   /* BLUE */
   timer_set_oc_mode (TIM1_BASE, TIM_OC2, TIM_OCM_PWM_1);
   timer_enable_oc_preload (TIM1_BASE, TIM_OC2);
+  timer_set_oc_value (TIM1_BASE, TIM_OC2, 0x0000);
  
-  TIM1_CCR2H = 0x00;
-  TIM1_CCR2L = 0x00;
   /* GREEN */
   timer_set_oc_mode (TIM1_BASE, TIM_OC3, TIM_OCM_PWM_1);
   timer_enable_oc_preload (TIM1_BASE, TIM_OC3);
-
-  TIM1_CCR3H = 0x00;
-  TIM1_CCR3L = 0x00;
+  timer_set_oc_value (TIM1_BASE, TIM_OC3, 0x0000);
 
   /* Enable outputs. */
-  TIM1_CCER1 |= TIM_CCER1_CC1E | TIM_CCER1_CC2E;
-  TIM1_CCER2 |= TIM_CCER2_CC3NE;
+  timer_enable_oc_output (TIM1_BASE, TIM_OC1);
+  timer_enable_oc_output (TIM1_BASE, TIM_OC2);
+  timer_enable_oc_output (TIM1_BASE, TIM_OC3N);
   
   /* Enable output */
-  TIM1_BKR |= TIM_BKR_MOE;
+  timer_enable_break_main_output (TIM1_BASE);
   
   /* Reinitialize registers */
   TIM1_EGR |= TIM_EGR_UG;
   
   /* Enable timer */
-  TIM1_CR1 |= TIM_CR1_CEN;
+  timer_enable_counter (TIM1_BASE);
 }
 
 void
 set_color (uint8_t r, uint8_t g, uint8_t b)
 {
-  TIM1_CCR1H = 0;
-  TIM1_CCR1L = r;
-  TIM1_CCR2H = 0;
-  TIM1_CCR2L = b;
-  TIM1_CCR3H = 0;
-  TIM1_CCR3L = g;
+  timer_set_oc_value (TIM1_BASE, TIM_OC1, r);
+  timer_set_oc_value (TIM1_BASE, TIM_OC2, b);
+  timer_set_oc_value (TIM1_BASE, TIM_OC3, g);
 }
 
 void
